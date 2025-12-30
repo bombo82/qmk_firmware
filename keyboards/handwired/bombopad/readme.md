@@ -40,6 +40,25 @@ qmk flash -kb handwired/bombopad/v0_3 -km default
 
 The `v0_3` version uses the `caterina` bootloader.
 
+### 3. Pro Micro RP2040 Support
+
+If you are using a **Pro Micro RP2040** module (such as the Waveshare RP2040-Plus or SparkFun Pro Micro RP2040), you can leverage QMK's **Converters**. This allows you to use the existing keyboard configuration without any modifications.
+
+To compile for the RP2040:
+
+```bash
+qmk compile -kb handwired/bombopad/v0_3 -km default -e CONVERT_TO=rp2040_ce
+```
+
+*(Note: `promicro_rp2040` is now deprecated in favour of `rp2040_ce` or `sparkfun_pm2040`).*
+
+#### Important Notes for RP2040:
+
+- **Pin Compatibility**: The `keyboard.json` file includes `"pin_compatible": "promicro"`, which enables the use of converters.
+- **Pin Mapping**: QMK automatically maps the original AVR pins (e.g. `B1`, `F4`) to the corresponding GPIO pins on the RP2040.
+- **Bootloader**: To enter bootloader mode on the RP2040, you usually need to hold the **BOOT** button while connecting the USB cable or pressing the **RESET** button on the module.
+- **Architecture**: The build system will automatically switch to the ARM/ChibiOS stack required for the RP2040.
+
 ## Development Information
 
 ### Global Variables
