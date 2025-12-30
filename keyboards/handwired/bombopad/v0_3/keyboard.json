@@ -15,5 +15,6 @@
         ]
     },
     "processor": "atmega32u4",
-    "bootloader": "caterina"
+    "bootloader": "caterina",
+    "pin_compatible": "promicro"
 }
