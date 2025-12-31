@@ -1,8 +1,10 @@
 # BomboPad QMK Firmware
 
-BomboPad is an open-source, versatile 12-key macropad featuring dual rotary encoders and display support. Designed with a focus on flexibility, it supports both wired and wireless configurations.
+BomboPad is an open-source, versatile 12-key macropad featuring dual rotary encoders and display support. Designed with
+a focus on flexibility, it supports both wired and wireless configurations.
 
-This directory contains the **QMK firmware** implementation for the BomboPad.
+This directory contains the **QMK firmware** implementation for the BomboPad, designed for wired use with controllers
+like the Pro Micro.
 
 ## Key Features (v0.3)
 
@@ -16,13 +18,14 @@ The current firmware version supports the following hardware features:
 
 ## Hardware Availability
 
-For hardware design files, electrical schematics, and PCB layouts, please refer to the **[main BomboPad repository](https://github.com/bombo82/bombopad)**.
+For hardware design files, electrical schematics, and PCB layouts, please refer to the
+**[main BomboPad repository](https://github.com/bombo82/bombopad)**.
 
 ## Build Instructions
 
 To build the firmware, ensure you have the QMK CLI installed and configured.
 
-### 1. Default Keymap
+### Default Keymap
 
 To compile the default keymap for version 0.3:
 
@@ -30,9 +33,9 @@ To compile the default keymap for version 0.3:
 qmk compile -kb handwired/bombopad/v0_3 -km default
 ```
 
-### 2. Flashing
+### Flashing
 
-To flash the firmware, use the `-f` flag or put the keyboard in bootloader mode (usually by resetting the Pro Micro) and run:
+To flash the firmware put the keyboard in bootloader mode (usually by resetting the Pro Micro) and run:
 
 ```bash
 qmk flash -kb handwired/bombopad/v0_3 -km default
@@ -40,9 +43,10 @@ qmk flash -kb handwired/bombopad/v0_3 -km default
 
 The `v0_3` version uses the `caterina` bootloader.
 
-### 3. Pro Micro RP2040 Support
+### Pro Micro RP2040 Support
 
-If you are using a **Pro Micro RP2040** module (such as the Waveshare RP2040-Plus or SparkFun Pro Micro RP2040), you can leverage QMK's **Converters**. This allows you to use the existing keyboard configuration without any modifications.
+If you are using a **Pro Micro RP2040** module (such as the Waveshare RP2040-Plus or SparkFun Pro Micro RP2040), you can
+leverage QMK's **Converters**. This allows you to use the existing keyboard configuration without any modifications.
 
 To compile for the RP2040:
 
@@ -54,9 +58,12 @@ qmk compile -kb handwired/bombopad/v0_3 -km default -e CONVERT_TO=rp2040_ce
 
 #### Important Notes for RP2040:
 
-- **Pin Compatibility**: The `keyboard.json` file includes `"pin_compatible": "promicro"`, which enables the use of converters.
-- **Pin Mapping**: QMK automatically maps the original AVR pins (e.g. `B1`, `F4`) to the corresponding GPIO pins on the RP2040.
-- **Bootloader**: To enter bootloader mode on the RP2040, you usually need to hold the **BOOT** button while connecting the USB cable or pressing the **RESET** button on the module.
+- **Pin Compatibility**: The `keyboard.json` file includes `"pin_compatible": "promicro"`, which enables the use of
+  converters.
+- **Pin Mapping**: QMK automatically maps the original AVR pins (e.g. `B1`, `F4`) to the corresponding GPIO pins on the
+  RP2040.
+- **Bootloader**: To enter bootloader mode on the RP2040, you usually need to hold the **BOOT** button while connecting
+  the USB cable or pressing the **RESET** button on the module.
 - **Architecture**: The build system will automatically switch to the ARM/ChibiOS stack required for the RP2040.
 
 ## Development Information
@@ -65,7 +72,8 @@ qmk compile -kb handwired/bombopad/v0_3 -km default -e CONVERT_TO=rp2040_ce
 
 The core keyboard code (`bombopad.c/h`) declares several variables as `extern` that must be defined in your `keymap.c`:
 
-- `uint8_t layer_size_bombopad`: Defines the total number of layers. **Mandatory** to initialize it for the cycling functions to work correctly.
+- `uint8_t layer_size_bombopad`: Defines the total number of layers. **Mandatory** to initialize it for the cycling
+  functions to work correctly.
 - `uint8_t current_layer_bombopad`: Tracks the currently active layer.
 - `bool hold_layer_bombopad`: Indicates if a layer is being held (used for OLED feedback).
 - `uint16_t hash_timer_bombopad`: Timer used to distinguish between tap and hold actions.
@@ -80,13 +88,14 @@ uint8_t layer_size_bombopad = 4; // If your keymap has 4 layers
 
 The firmware provides two main functions to navigate through layers, associated with custom keycodes:
 
-1.  **`cycle_layers_bombopad` (Keycode: `KB_CYCLE_L`)**:
+1. **`cycle_layers_bombopad` (Keycode: `KB_CYCLE_L`)**:
     - Cycles to the next layer on each press.
     - Returns to layer `0` after reaching the last layer (`layer_size_bombopad - 1`).
 
-2.  **`cycle_layers_hold_bombopad` (Keycode: `KB_CYCLE_LH`)**:
+2. **`cycle_layers_hold_bombopad` (Keycode: `KB_CYCLE_LH`)**:
     - **Tap**: Cycles to the next layer.
-    - **Hold**: Momentarily activates the **last layer** defined in the keymap until released. Useful for a utility layer (e.g., media controls).
+    - **Hold**: Momentarily activates the **last layer** defined in the keymap until released. Useful for a utility
+      layer (e.g., media controls).
 
 #### Usage Example
 
@@ -115,17 +124,20 @@ The keyboard header defines `custom_keycodes_kb` starting at `SAFE_RANGE`:
 - `KB_CYCLE_L`
 - `KB_CYCLE_LH`
 
-Keymaps should define their own custom keycodes starting at `SAFE_RANGE` (if not using the keyboard ones) or after the keyboard's custom keycodes.
+Keymaps should define their own custom keycodes starting at `SAFE_RANGE` (if not using the keyboard ones) or after the
+keyboard's custom keycodes.
 
 ### OLED Support
 
-OLED support is enabled by default in `rules.mk` and uses the `ssd1306` driver. Configuration can be found in `config.h`.
+OLED support is enabled by default in `rules.mk` and uses the `ssd1306` driver. Configuration can be found in
+`config.h`.
 
-To customise the information displayed on the OLED, you need to implement the `oled_task_user` function in your `keymap.c`.
+To customise the information displayed on the OLED, you need to implement the `oled_task_user` function in your
+`keymap.c`.
 
 #### Configuration Example
 
-The following example shows how to display the current layer name and a visual representation of the key layout:
+The following example shows how to display the current layer name:
 
 ```c
 bool oled_task_user(void) {
