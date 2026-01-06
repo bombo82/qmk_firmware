@@ -70,12 +70,17 @@ qmk compile -kb handwired/bombopad/v0_3 -km default -e CONVERT_TO=rp2040_ce
 
 ### Global Variables
 
-The core keyboard code (`bombopad.c/h`) declares several variables as `extern` that must be defined in your `keymap.c`:
+The core keyboard code (`bombopad.c/h`) uses several variables to manage its state. Most are handled automatically, but
+one **must** be defined in your `keymap.c`:
 
-- `uint8_t layer_size_bombopad`: Defines the total number of layers. **Mandatory** to initialize it for the cycling
-  functions to work correctly.
+- `uint8_t layer_size_bombopad`: Defines the total number of layers in your keymap. **Mandatory** to initialize it for
+  the cycling functions to work correctly.
+
+The following variables are available for use in your keymap (e.g., for custom OLED rendering) but are already managed
+by the keyboard level:
+
 - `uint8_t current_layer_bombopad`: Tracks the currently active layer.
-- `bool hold_layer_bombopad`: Indicates if a layer is being held (used for OLED feedback).
+- `bool hold_layer_bombopad`: Indicates if a layer is being held.
 - `uint16_t hash_timer_bombopad`: Timer used to distinguish between tap and hold actions.
 
 **Example initialization in `keymap.c`:**
@@ -132,12 +137,29 @@ keyboard's custom keycodes.
 OLED support is enabled by default in `rules.mk` and uses the `ssd1306` driver. Configuration can be found in
 `config.h`.
 
-To customise the information displayed on the OLED, you need to implement the `oled_task_user` function in your
-`keymap.c`.
+The keyboard level implements a default `oled_task_kb` that handles the display. You can customize it by implementing
+`oled_task_user` in your `keymap.c`.
 
-#### Configuration Example
+#### Return Values for `oled_task_user`
 
-The following example shows how to display the current layer name:
+- **`return true`**: Tells the keyboard level to proceed with its default rendering.
+- **`return false`**: Tells the keyboard level that you have handled the rendering (or want it blank), and it should
+  skip its default rendering.
+
+#### Default Rendering Example
+
+If you want to use the default display provided by the keyboard level, you can simply not implement `oled_task_user` or
+implement it like this:
+
+```c
+bool oled_task_user(void) {
+    return true; // Use default keyboard rendering
+}
+```
+
+#### Custom Rendering Example
+
+The following example shows how to perform a full custom rendering:
 
 ```c
 bool oled_task_user(void) {
@@ -162,7 +184,7 @@ bool oled_task_user(void) {
         oled_write_ln_P(PSTR("LAST LAYER HOLD"), false);
     }
 
-    return false;
+    return false; // Skip default keyboard rendering
 }
 ```
 
